@@ -1,11 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CompanyUserController;
 use App\Http\Controllers\CompanyGuideController;
-
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -32,6 +34,24 @@ Route::middleware('auth')->group(function () {
     Route::resource('companies', CompanyController::class)->middleware('isAdmin');
     Route::resource('companies.users', CompanyUserController::class)->except('show');
     Route::resource('companies.guides', CompanyGuideController::class)->except('show');
+    Route::get('/excel', [ExcelController::class, 'index']);
+    Route::get('/show-excel', [ExcelController::class, 'showExcel']);
+    Route::get('/excel/{filename}', function ($filename) {
+        $filename = basename($filename);
+
+        $path = storage_path("app/public/{$filename}");
+
+        if (!File::exists($path)) {
+            abort(404);
+        }
+
+        $fileContents = file_get_contents($path);
+
+        return response($fileContents, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'inline; filename="' . $filename . '"',
+        ]);
+    })->where('filename', '.*');
 });
 
 require __DIR__ . '/auth.php';
