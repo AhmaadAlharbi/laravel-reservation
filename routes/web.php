@@ -1,13 +1,14 @@
 <?php
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CompanyUserController;
 use App\Http\Controllers\CompanyGuideController;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\CompanyActivityController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -52,6 +53,7 @@ Route::middleware('auth')->group(function () {
             'Content-Disposition' => 'inline; filename="' . $filename . '"',
         ]);
     })->where('filename', '.*');
+    Route::resource('companies.activities', CompanyActivityController::class);
 });
 
 require __DIR__ . '/auth.php';
